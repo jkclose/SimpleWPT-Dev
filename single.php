@@ -1,92 +1,40 @@
 <?php
 /**
- * The template for displaying single posts
+ * The template for displaying all single posts
  *
- * @package Clean_Modern_Theme
+ * @link https://developer.wordpress.org/themes/basics/template-hierarchy/#single-post
+ *
+ * @package D20_Dungeon_V2
  */
 
 get_header();
 ?>
 
-<main id="primary" class="site-main">
-    <div class="container-narrow">
+	<main id="primary" class="site-main">
 
-        <?php
-        while ( have_posts() ) :
-            the_post();
-            ?>
+		<?php
+		while ( have_posts() ) :
+			the_post();
 
-            <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-                
-                <?php if ( has_post_thumbnail() ) : ?>
-                    <div class="post-thumbnail">
-                        <?php the_post_thumbnail( 'clean-modern-featured' ); ?>
-                    </div>
-                <?php endif; ?>
+			get_template_part( 'template-parts/content', get_post_type() );
 
-                <header class="entry-header">
-                    <?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
-                    <?php clean_modern_theme_post_meta(); ?>
-                </header><!-- .entry-header -->
+			the_post_navigation(
+				array(
+					'prev_text' => '<span class="nav-subtitle">' . esc_html__( 'Previous:', 'd20-dungeon-v2' ) . '</span> <span class="nav-title">%title</span>',
+					'next_text' => '<span class="nav-subtitle">' . esc_html__( 'Next:', 'd20-dungeon-v2' ) . '</span> <span class="nav-title">%title</span>',
+				)
+			);
 
-                <div class="entry-content">
-                    <?php
-                    the_content(
-                        sprintf(
-                            wp_kses(
-                                __( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'clean-modern-theme' ),
-                                array(
-                                    'span' => array(
-                                        'class' => array(),
-                                    ),
-                                )
-                            ),
-                            wp_kses_post( get_the_title() )
-                        )
-                    );
+			// If comments are open or we have at least one comment, load up the comment template.
+			if ( comments_open() || get_comments_number() ) :
+				comments_template();
+			endif;
 
-                    wp_link_pages(
-                        array(
-                            'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'clean-modern-theme' ),
-                            'after'  => '</div>',
-                        )
-                    );
-                    ?>
-                </div><!-- .entry-content -->
+		endwhile; // End of the loop.
+		?>
 
-                <footer class="entry-footer">
-                    <?php
-                    echo '<div class="post-categories">';
-                    clean_modern_theme_categories();
-                    echo '</div>';
-                    
-                    echo '<div class="post-tags">';
-                    clean_modern_theme_tags();
-                    echo '</div>';
-                    ?>
-                </footer><!-- .entry-footer -->
-
-            </article><!-- #post-<?php the_ID(); ?> -->
-
-            <?php
-            // If comments are open or we have at least one comment, load up the comment template
-            if ( comments_open() || get_comments_number() ) :
-                comments_template();
-            endif;
-
-            // Previous/Next post navigation
-            the_post_navigation(
-                array(
-                    'prev_text' => '<span class="nav-subtitle">' . esc_html__( 'Previous:', 'clean-modern-theme' ) . '</span> <span class="nav-title">%title</span>',
-                    'next_text' => '<span class="nav-subtitle">' . esc_html__( 'Next:', 'clean-modern-theme' ) . '</span> <span class="nav-title">%title</span>',
-                )
-            );
-
-        endwhile; // End of the loop
-        ?>
-
-    </div><!-- .container-narrow -->
-</main><!-- #primary -->
+	</main><!-- #main -->
 
 <?php
+get_sidebar();
 get_footer();

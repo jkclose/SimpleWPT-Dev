@@ -2,92 +2,50 @@
 /**
  * The template for displaying archive pages
  *
- * @package Clean_Modern_Theme
+ * @link https://developer.wordpress.org/themes/basics/template-hierarchy/
+ *
+ * @package D20_Dungeon_V2
  */
 
 get_header();
 ?>
 
-<main id="primary" class="site-main">
-    <div class="container">
+	<main id="primary" class="site-main">
 
-        <?php if ( have_posts() ) : ?>
+		<?php if ( have_posts() ) : ?>
 
-            <header class="page-header">
-                <?php
-                the_archive_title( '<h1 class="page-title">', '</h1>' );
-                the_archive_description( '<div class="archive-description">', '</div>' );
-                ?>
-            </header><!-- .page-header -->
+			<header class="page-header">
+				<?php
+				the_archive_title( '<h1 class="page-title">', '</h1>' );
+				the_archive_description( '<div class="archive-description">', '</div>' );
+				?>
+			</header><!-- .page-header -->
 
-            <div class="posts-grid">
-                <?php
-                // Start the Loop
-                while ( have_posts() ) :
-                    the_post();
-                    ?>
-                    
-                    <article id="post-<?php the_ID(); ?>" <?php post_class( 'post-card' ); ?>>
-                        
-                        <?php if ( has_post_thumbnail() ) : ?>
-                            <div class="post-card-thumbnail">
-                                <a href="<?php the_permalink(); ?>">
-                                    <?php the_post_thumbnail( 'clean-modern-card' ); ?>
-                                </a>
-                            </div>
-                        <?php endif; ?>
+			<?php
+			/* Start the Loop */
+			while ( have_posts() ) :
+				the_post();
 
-                        <div class="post-card-content">
-                            <header class="entry-header">
-                                <?php
-                                if ( 'post' === get_post_type() ) {
-                                    clean_modern_theme_post_meta();
-                                }
-                                
-                                the_title( '<h2 class="post-card-title"><a href="' . esc_url( get_permalink() ) . '" rel="bookmark">', '</a></h2>' );
-                                ?>
-                            </header><!-- .entry-header -->
+				/*
+				 * Include the Post-Type-specific template for the content.
+				 * If you want to override this in a child theme, then include a file
+				 * called content-___.php (where ___ is the Post Type name) and that will be used instead.
+				 */
+				get_template_part( 'template-parts/content', get_post_type() );
 
-                            <div class="post-card-excerpt">
-                                <?php the_excerpt(); ?>
-                            </div>
+			endwhile;
 
-                            <a href="<?php the_permalink(); ?>" class="read-more">
-                                <?php esc_html_e( 'Read More', 'clean-modern-theme' ); ?> &rarr;
-                            </a>
-                        </div><!-- .post-card-content -->
+			the_posts_navigation();
 
-                    </article><!-- #post-<?php the_ID(); ?> -->
+		else :
 
-                    <?php
-                endwhile;
-                ?>
-            </div><!-- .posts-grid -->
+			get_template_part( 'template-parts/content', 'none' );
 
-            <?php
-            // Pagination
-            clean_modern_theme_pagination();
+		endif;
+		?>
 
-        else :
-            ?>
-
-            <section class="no-results not-found">
-                <header class="page-header">
-                    <h1 class="page-title"><?php esc_html_e( 'Nothing Found', 'clean-modern-theme' ); ?></h1>
-                </header><!-- .page-header -->
-
-                <div class="page-content">
-                    <p><?php esc_html_e( 'It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help.', 'clean-modern-theme' ); ?></p>
-                    <?php get_search_form(); ?>
-                </div><!-- .page-content -->
-            </section><!-- .no-results -->
-
-            <?php
-        endif;
-        ?>
-
-    </div><!-- .container -->
-</main><!-- #primary -->
+	</main><!-- #main -->
 
 <?php
+get_sidebar();
 get_footer();

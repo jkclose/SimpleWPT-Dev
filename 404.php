@@ -2,52 +2,59 @@
 /**
  * The template for displaying 404 pages (not found)
  *
- * @package Clean_Modern_Theme
+ * @link https://codex.wordpress.org/Creating_an_Error_404_Page
+ *
+ * @package D20_Dungeon_V2
  */
 
 get_header();
 ?>
 
-<main id="primary" class="site-main">
-    <div class="container-narrow">
+	<main id="primary" class="site-main">
 
-        <section class="error-404 not-found">
-            <header class="page-header">
-                <h1 class="page-title"><?php esc_html_e( '404 - Page Not Found', 'clean-modern-theme' ); ?></h1>
-            </header><!-- .page-header -->
+		<section class="error-404 not-found">
+			<header class="page-header">
+				<h1 class="page-title"><?php esc_html_e( 'Oops! That page can&rsquo;t be found.', 'd20-dungeon-v2' ); ?></h1>
+			</header><!-- .page-header -->
 
-            <div class="page-content">
-                <p><?php esc_html_e( 'It looks like nothing was found at this location. Maybe try a search?', 'clean-modern-theme' ); ?></p>
+			<div class="page-content">
+				<p><?php esc_html_e( 'It looks like nothing was found at this location. Maybe try one of the links below or a search?', 'd20-dungeon-v2' ); ?></p>
 
-                <?php get_search_form(); ?>
+					<?php
+					get_search_form();
 
-                <div style="margin-top: 3rem;">
-                    <h2><?php esc_html_e( 'Recent Posts', 'clean-modern-theme' ); ?></h2>
-                    <?php
-                    $recent_posts = wp_get_recent_posts( array(
-                        'numberposts' => 5,
-                        'post_status' => 'publish',
-                    ) );
+					the_widget( 'WP_Widget_Recent_Posts' );
+					?>
 
-                    if ( $recent_posts ) {
-                        echo '<ul>';
-                        foreach ( $recent_posts as $recent ) {
-                            printf(
-                                '<li><a href="%1$s">%2$s</a></li>',
-                                esc_url( get_permalink( $recent['ID'] ) ),
-                                esc_html( $recent['post_title'] )
-                            );
-                        }
-                        echo '</ul>';
-                    }
-                    ?>
-                </div>
+					<div class="widget widget_categories">
+						<h2 class="widget-title"><?php esc_html_e( 'Most Used Categories', 'd20-dungeon-v2' ); ?></h2>
+						<ul>
+							<?php
+							wp_list_categories(
+								array(
+									'orderby'    => 'count',
+									'order'      => 'DESC',
+									'show_count' => 1,
+									'title_li'   => '',
+									'number'     => 10,
+								)
+							);
+							?>
+						</ul>
+					</div><!-- .widget -->
 
-            </div><!-- .page-content -->
-        </section><!-- .error-404 -->
+					<?php
+					/* translators: %1$s: smiley */
+					$d20_dungeon_v2_archive_content = '<p>' . sprintf( esc_html__( 'Try looking in the monthly archives. %1$s', 'd20-dungeon-v2' ), convert_smilies( ':)' ) ) . '</p>';
+					the_widget( 'WP_Widget_Archives', 'dropdown=1', "after_title=</h2>$d20_dungeon_v2_archive_content" );
 
-    </div><!-- .container-narrow -->
-</main><!-- #primary -->
+					the_widget( 'WP_Widget_Tag_Cloud' );
+					?>
+
+			</div><!-- .page-content -->
+		</section><!-- .error-404 -->
+
+	</main><!-- #main -->
 
 <?php
 get_footer();

@@ -1,355 +1,184 @@
 <?php
 /**
- * Clean Modern Theme Functions
+ * D20 Dungeon V2 functions and definitions
  *
- * @package Clean_Modern_Theme
+ * @link https://developer.wordpress.org/themes/basics/theme-functions/
+ *
+ * @package D20_Dungeon_V2
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly
+if ( ! defined( '_S_VERSION' ) ) {
+	// Replace the version number of the theme on each release.
+	define( '_S_VERSION', '1.0.0' );
 }
 
 /**
- * Theme Setup
+ * Sets up theme defaults and registers support for various WordPress features.
+ *
+ * Note that this function is hooked into the after_setup_theme hook, which
+ * runs before the init hook. The init hook is too late for some features, such
+ * as indicating support for post thumbnails.
  */
-function clean_modern_theme_setup() {
-    // Make theme available for translation
-    load_theme_textdomain( 'clean-modern-theme', get_template_directory() . '/languages' );
+function d20_dungeon_v2_setup() {
+	/*
+		* Make theme available for translation.
+		* Translations can be filed in the /languages/ directory.
+		* If you're building a theme based on D20 Dungeon V2, use a find and replace
+		* to change 'd20-dungeon-v2' to the name of your theme in all the template files.
+		*/
+	load_theme_textdomain( 'd20-dungeon-v2', get_template_directory() . '/languages' );
 
-    // Add default posts and comments RSS feed links to head
-    add_theme_support( 'automatic-feed-links' );
+	// Add default posts and comments RSS feed links to head.
+	add_theme_support( 'automatic-feed-links' );
 
-    // Let WordPress manage the document title
-    add_theme_support( 'title-tag' );
+	/*
+		* Let WordPress manage the document title.
+		* By adding theme support, we declare that this theme does not use a
+		* hard-coded <title> tag in the document head, and expect WordPress to
+		* provide it for us.
+		*/
+	add_theme_support( 'title-tag' );
 
-    // Enable support for Post Thumbnails
-    add_theme_support( 'post-thumbnails' );
-    set_post_thumbnail_size( 1200, 675, true );
-    add_image_size( 'clean-modern-featured', 1200, 675, true );
-    add_image_size( 'clean-modern-card', 600, 400, true );
+	/*
+		* Enable support for Post Thumbnails on posts and pages.
+		*
+		* @link https://developer.wordpress.org/themes/functionality/featured-images-post-thumbnails/
+		*/
+	add_theme_support( 'post-thumbnails' );
 
-    // Register navigation menus
-    register_nav_menus( array(
-        'primary' => esc_html__( 'Primary Menu', 'clean-modern-theme' ),
-        'footer'  => esc_html__( 'Footer Menu', 'clean-modern-theme' ),
-    ) );
+	// This theme uses wp_nav_menu() in one location.
+	register_nav_menus(
+		array(
+			'menu-1' => esc_html__( 'Primary', 'd20-dungeon-v2' ),
+		)
+	);
 
-    // Switch default core markup to output valid HTML5
-    add_theme_support( 'html5', array(
-        'search-form',
-        'comment-form',
-        'comment-list',
-        'gallery',
-        'caption',
-        'style',
-        'script',
-    ) );
+	/*
+		* Switch default core markup for search form, comment form, and comments
+		* to output valid HTML5.
+		*/
+	add_theme_support(
+		'html5',
+		array(
+			'search-form',
+			'comment-form',
+			'comment-list',
+			'gallery',
+			'caption',
+			'style',
+			'script',
+		)
+	);
 
-    // Add theme support for custom logo
-    add_theme_support( 'custom-logo', array(
-        'height'      => 100,
-        'width'       => 400,
-        'flex-height' => true,
-        'flex-width'  => true,
-    ) );
+	// Set up the WordPress core custom background feature.
+	add_theme_support(
+		'custom-background',
+		apply_filters(
+			'd20_dungeon_v2_custom_background_args',
+			array(
+				'default-color' => 'ffffff',
+				'default-image' => '',
+			)
+		)
+	);
 
-    // Add support for responsive embedded content
-    add_theme_support( 'responsive-embeds' );
+	// Add theme support for selective refresh for widgets.
+	add_theme_support( 'customize-selective-refresh-widgets' );
 
-    // Add support for editor styles
-    add_theme_support( 'editor-styles' );
-
-    // Enqueue editor styles
-    add_editor_style( 'style-editor.css' );
-
-    // Add support for wide and full alignment
-    add_theme_support( 'align-wide' );
-
-    // Add support for Block Styles
-    add_theme_support( 'wp-block-styles' );
-
-    // Disable custom colors (use theme palette only)
-    add_theme_support( 'disable-custom-colors' );
-
-    // Disable custom font sizes (use theme sizes only)
-    add_theme_support( 'disable-custom-font-sizes' );
+	/**
+	 * Add support for core custom logo.
+	 *
+	 * @link https://codex.wordpress.org/Theme_Logo
+	 */
+	add_theme_support(
+		'custom-logo',
+		array(
+			'height'      => 250,
+			'width'       => 250,
+			'flex-width'  => true,
+			'flex-height' => true,
+		)
+	);
 }
-add_action( 'after_setup_theme', 'clean_modern_theme_setup' );
+add_action( 'after_setup_theme', 'd20_dungeon_v2_setup' );
 
 /**
- * Set the content width in pixels
+ * Set the content width in pixels, based on the theme's design and stylesheet.
+ *
+ * Priority 0 to make it available to lower priority callbacks.
+ *
+ * @global int $content_width
  */
-function clean_modern_theme_content_width() {
-    $GLOBALS['content_width'] = apply_filters( 'clean_modern_theme_content_width', 1200 );
+function d20_dungeon_v2_content_width() {
+	$GLOBALS['content_width'] = apply_filters( 'd20_dungeon_v2_content_width', 640 );
 }
-add_action( 'after_setup_theme', 'clean_modern_theme_content_width', 0 );
+add_action( 'after_setup_theme', 'd20_dungeon_v2_content_width', 0 );
 
 /**
- * Enqueue scripts and styles
+ * Register widget area.
+ *
+ * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
  */
-function clean_modern_theme_scripts() {
-    // Main stylesheet
-    wp_enqueue_style( 'clean-modern-theme-style', get_stylesheet_uri(), array(), wp_get_theme()->get( 'Version' ) );
-
-    // Mobile navigation script
-    wp_enqueue_script( 
-        'clean-modern-theme-navigation', 
-        get_template_directory_uri() . '/js/navigation.js', 
-        array(), 
-        wp_get_theme()->get( 'Version' ), 
-        true 
-    );
-
-    // Comments reply script
-    if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
-        wp_enqueue_script( 'comment-reply' );
-    }
+function d20_dungeon_v2_widgets_init() {
+	register_sidebar(
+		array(
+			'name'          => esc_html__( 'Sidebar', 'd20-dungeon-v2' ),
+			'id'            => 'sidebar-1',
+			'description'   => esc_html__( 'Add widgets here.', 'd20-dungeon-v2' ),
+			'before_widget' => '<section id="%1$s" class="widget %2$s">',
+			'after_widget'  => '</section>',
+			'before_title'  => '<h2 class="widget-title">',
+			'after_title'   => '</h2>',
+		)
+	);
 }
-add_action( 'wp_enqueue_scripts', 'clean_modern_theme_scripts' );
+add_action( 'widgets_init', 'd20_dungeon_v2_widgets_init' );
 
 /**
- * ACF Integration - Check if ACF is active
+ * Enqueue scripts and styles.
  */
-function clean_modern_theme_acf_check() {
-    if ( ! class_exists( 'ACF' ) && current_user_can( 'activate_plugins' ) ) {
-        add_action( 'admin_notices', 'clean_modern_theme_acf_notice' );
-    }
+function d20_dungeon_v2_scripts() {
+	wp_enqueue_style( 'd20-dungeon-v2-style', get_stylesheet_uri(), array(), _S_VERSION );
+	wp_style_add_data( 'd20-dungeon-v2-style', 'rtl', 'replace' );
+
+	wp_enqueue_script( 'd20-dungeon-v2-navigation', get_template_directory_uri() . '/js/navigation.js', array(), _S_VERSION, true );
+
+	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
+		wp_enqueue_script( 'comment-reply' );
+	}
 }
-add_action( 'admin_init', 'clean_modern_theme_acf_check' );
+add_action( 'wp_enqueue_scripts', 'd20_dungeon_v2_scripts' );
 
 /**
- * Display admin notice if ACF is not active
+ * Implement the Custom Header feature.
  */
-function clean_modern_theme_acf_notice() {
-    ?>
-    <div class="notice notice-warning is-dismissible">
-        <p><?php esc_html_e( 'Clean Modern Theme: Advanced Custom Fields plugin is recommended for full theme functionality.', 'clean-modern-theme' ); ?></p>
-    </div>
-    <?php
-}
+require get_template_directory() . '/inc/custom-header.php';
 
 /**
- * ACF Options Page (if needed)
- * Uncomment if you want theme options page
+ * Custom template tags for this theme.
  */
-/*
-if ( function_exists( 'acf_add_options_page' ) ) {
-    acf_add_options_page( array(
-        'page_title' => 'Theme Settings',
-        'menu_title' => 'Theme Settings',
-        'menu_slug'  => 'theme-settings',
-        'capability' => 'edit_posts',
-        'redirect'   => false
-    ) );
-}
-*/
+require get_template_directory() . '/inc/template-tags.php';
 
 /**
- * Register Custom Post Type - Example
- * You can add more custom post types here or use ACF to create them
+ * Functions which enhance the theme by hooking into WordPress.
  */
-function clean_modern_theme_register_post_types() {
-    // Example: Portfolio Custom Post Type
-    $portfolio_labels = array(
-        'name'               => _x( 'Portfolio', 'post type general name', 'clean-modern-theme' ),
-        'singular_name'      => _x( 'Portfolio Item', 'post type singular name', 'clean-modern-theme' ),
-        'menu_name'          => _x( 'Portfolio', 'admin menu', 'clean-modern-theme' ),
-        'add_new'            => _x( 'Add New', 'portfolio item', 'clean-modern-theme' ),
-        'add_new_item'       => __( 'Add New Portfolio Item', 'clean-modern-theme' ),
-        'new_item'           => __( 'New Portfolio Item', 'clean-modern-theme' ),
-        'edit_item'          => __( 'Edit Portfolio Item', 'clean-modern-theme' ),
-        'view_item'          => __( 'View Portfolio Item', 'clean-modern-theme' ),
-        'all_items'          => __( 'All Portfolio', 'clean-modern-theme' ),
-        'search_items'       => __( 'Search Portfolio', 'clean-modern-theme' ),
-    );
-
-    $portfolio_args = array(
-        'labels'             => $portfolio_labels,
-        'public'             => true,
-        'publicly_queryable' => true,
-        'show_ui'            => true,
-        'show_in_menu'       => true,
-        'query_var'          => true,
-        'rewrite'            => array( 'slug' => 'portfolio' ),
-        'capability_type'    => 'post',
-        'has_archive'        => true,
-        'hierarchical'       => false,
-        'menu_position'      => 5,
-        'menu_icon'          => 'dashicons-portfolio',
-        'supports'           => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
-        'show_in_rest'       => true, // Enable Gutenberg
-    );
-
-    // Uncomment to register the portfolio post type
-    // register_post_type( 'portfolio', $portfolio_args );
-}
-add_action( 'init', 'clean_modern_theme_register_post_types' );
+require get_template_directory() . '/inc/template-functions.php';
 
 /**
- * Register Custom Taxonomy - Example
+ * Customizer additions.
  */
-function clean_modern_theme_register_taxonomies() {
-    // Example: Portfolio Category
-    $category_labels = array(
-        'name'              => _x( 'Portfolio Categories', 'taxonomy general name', 'clean-modern-theme' ),
-        'singular_name'     => _x( 'Portfolio Category', 'taxonomy singular name', 'clean-modern-theme' ),
-        'search_items'      => __( 'Search Categories', 'clean-modern-theme' ),
-        'all_items'         => __( 'All Categories', 'clean-modern-theme' ),
-        'edit_item'         => __( 'Edit Category', 'clean-modern-theme' ),
-        'update_item'       => __( 'Update Category', 'clean-modern-theme' ),
-        'add_new_item'      => __( 'Add New Category', 'clean-modern-theme' ),
-        'new_item_name'     => __( 'New Category Name', 'clean-modern-theme' ),
-        'menu_name'         => __( 'Categories', 'clean-modern-theme' ),
-    );
-
-    $category_args = array(
-        'labels'            => $category_labels,
-        'hierarchical'      => true,
-        'show_ui'           => true,
-        'show_admin_column' => true,
-        'query_var'         => true,
-        'rewrite'           => array( 'slug' => 'portfolio-category' ),
-        'show_in_rest'      => true, // Enable Gutenberg
-    );
-
-    // Uncomment to register the taxonomy
-    // register_taxonomy( 'portfolio_category', array( 'portfolio' ), $category_args );
-}
-add_action( 'init', 'clean_modern_theme_register_taxonomies' );
+require get_template_directory() . '/inc/customizer.php';
 
 /**
- * Excerpt Length
+ * Load Jetpack compatibility file.
  */
-function clean_modern_theme_excerpt_length( $length ) {
-    return 25;
-}
-add_filter( 'excerpt_length', 'clean_modern_theme_excerpt_length' );
-
-/**
- * Excerpt More
- */
-function clean_modern_theme_excerpt_more( $more ) {
-    return '...';
-}
-add_filter( 'excerpt_more', 'clean_modern_theme_excerpt_more' );
-
-/**
- * Add custom classes to body
- */
-function clean_modern_theme_body_classes( $classes ) {
-    // Add class if sidebar is active
-    if ( is_active_sidebar( 'sidebar-1' ) ) {
-        $classes[] = 'has-sidebar';
-    }
-
-    // Add class for ACF
-    if ( class_exists( 'ACF' ) ) {
-        $classes[] = 'has-acf';
-    }
-
-    return $classes;
-}
-add_filter( 'body_class', 'clean_modern_theme_body_classes' );
-
-/**
- * Pagination
- */
-function clean_modern_theme_pagination() {
-    if ( is_singular() ) {
-        return;
-    }
-
-    global $wp_query;
-
-    if ( $wp_query->max_num_pages <= 1 ) {
-        return;
-    }
-
-    $paged = get_query_var( 'paged' ) ? absint( get_query_var( 'paged' ) ) : 1;
-
-    $pagination_args = array(
-        'base'      => str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999 ) ) ),
-        'format'    => '?paged=%#%',
-        'current'   => max( 1, $paged ),
-        'total'     => $wp_query->max_num_pages,
-        'prev_text' => '&larr;',
-        'next_text' => '&rarr;',
-    );
-
-    echo '<nav class="pagination">';
-    echo paginate_links( $pagination_args );
-    echo '</nav>';
+if ( defined( 'JETPACK__VERSION' ) ) {
+	require get_template_directory() . '/inc/jetpack.php';
 }
 
 /**
- * Template Tags
+ * Load WooCommerce compatibility file.
  */
-
-/**
- * Display post meta
- */
-function clean_modern_theme_post_meta() {
-    $time_string = '<time class="entry-date published updated" datetime="%1$s">%2$s</time>';
-
-    $time_string = sprintf(
-        $time_string,
-        esc_attr( get_the_date( DATE_W3C ) ),
-        esc_html( get_the_date() )
-    );
-
-    $posted_on = sprintf(
-        '<a href="%1$s" rel="bookmark">%2$s</a>',
-        esc_url( get_permalink() ),
-        $time_string
-    );
-
-    $byline = sprintf(
-        '<span class="author vcard"><a class="url fn n" href="%1$s">%2$s</a></span>',
-        esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ),
-        esc_html( get_the_author() )
-    );
-
-    echo '<div class="entry-meta">';
-    echo '<span class="posted-on">' . $posted_on . '</span>';
-    echo '<span class="byline"> by ' . $byline . '</span>';
-
-    if ( ! is_single() && ! post_password_required() && ( comments_open() || get_comments_number() ) ) {
-        echo '<span class="comments-link">';
-        comments_popup_link(
-            sprintf(
-                wp_kses(
-                    __( 'Leave a Comment<span class="screen-reader-text"> on %s</span>', 'clean-modern-theme' ),
-                    array(
-                        'span' => array(
-                            'class' => array(),
-                        ),
-                    )
-                ),
-                wp_kses_post( get_the_title() )
-            )
-        );
-        echo '</span>';
-    }
-
-    echo '</div>';
-}
-
-/**
- * Display categories
- */
-function clean_modern_theme_categories() {
-    $categories_list = get_the_category_list( esc_html__( ', ', 'clean-modern-theme' ) );
-    if ( $categories_list ) {
-        printf( '<span class="cat-links">%1$s</span>', $categories_list );
-    }
-}
-
-/**
- * Display tags
- */
-function clean_modern_theme_tags() {
-    $tags_list = get_the_tag_list( '', esc_html_x( ', ', 'list item separator', 'clean-modern-theme' ) );
-    if ( $tags_list ) {
-        printf( '<span class="tags-links">%1$s</span>', $tags_list );
-    }
+if ( class_exists( 'WooCommerce' ) ) {
+	require get_template_directory() . '/inc/woocommerce.php';
 }
